@@ -154,7 +154,7 @@ async function CreateServer(email, egg, name) {
             allocations: 2
         },
         deploy: {
-            locations: [1], // Remplacez par l'ID de l'emplacement souhaité
+            locations: [1],
             dedicated_ip: false,
             port_range: []
         }
