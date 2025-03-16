@@ -17,11 +17,9 @@ module.exports = {
         const email = interaction.options.getString('email');
 
         try {
-            // Récupérer l'utilisateur par e-mail
             const user = await Pterodactyl.GetUser(email);
             const user_id = user.attributes.id;
 
-            // Récupérer les serveurs de l'utilisateur
             const servers = await Pterodactyl.GetServers();
             const filteredServers = servers.filter(server => server.attributes.user === user_id);
 
@@ -35,7 +33,6 @@ module.exports = {
                 });
             }
 
-            // Créer le menu déroulant des serveurs
             const row = new ActionRowBuilder()
                 .addComponents(
                     new StringSelectMenuBuilder()
@@ -50,30 +47,26 @@ module.exports = {
                         )
                 );
 
-            // Envoyer la réponse initiale avec le menu déroulant
             const reply = await interaction.reply({
                 embeds: [{
                     color: Colors.Blue,
                     description: `Serveurs associés à \`${email}\` :\n${filteredServers.map(server => `- **${server.attributes.name}** (ID: ${server.attributes.identifier})`).join('\n')}`
                 }],
                 components: [row],
-                fetchReply: true // Récupérer l'objet Message pour gérer les interactions
+                fetchReply: true
             });
 
             // Gestion des interactions
             const filter = (i) => i.user.id === interaction.user.id && i.isStringSelectMenu();
-            const collector = reply.createMessageComponentCollector({ filter, time: 60000 }); // 60 secondes
+            const collector = reply.createMessageComponentCollector({ filter, time: 60000 });
 
             collector.on('collect', async (selectInteraction) => {
                 try {
-                    // Supprimer le serveur sélectionné
                     await Pterodactyl.DeleteServer(selectInteraction.values[0]);
 
-                    // Mettre à jour la liste des serveurs après la suppression
                     const updatedServers = await Pterodactyl.GetServers();
                     const updatedFilteredServers = updatedServers.filter(server => server.attributes.user === user_id);
 
-                    // Mettre à jour le menu déroulant
                     const updatedRow = new ActionRowBuilder()
                         .addComponents(
                             new StringSelectMenuBuilder()
@@ -88,13 +81,12 @@ module.exports = {
                                 )
                         );
 
-                    // Mettre à jour le message avec la nouvelle liste de serveurs
                     await selectInteraction.update({
                         embeds: [{
                             color: Colors.Blue,
                             description: `Serveurs associés à \`${email}\` :\n${updatedFilteredServers.map(server => `- **${server.attributes.name}** (ID: ${server.attributes.identifier})`).join('\n')}`
                         }],
-                        components: updatedFilteredServers.length > 0 ? [updatedRow] : [] // Supprimer le menu si aucun serveur n'est disponible
+                        components: updatedFilteredServers.length > 0 ? [updatedRow] : []
                     });
                 } catch (error) {
                     console.error(error);
@@ -103,14 +95,14 @@ module.exports = {
                             color: Colors.Red,
                             description: `Une erreur est survenue lors de la suppression du serveur.`
                         }],
-                        components: [] // Supprimer le menu en cas d'erreur
+                        components: []
                     });
                 }
             });
 
             collector.on('end', async () => {
                 await interaction.editReply({
-                    components: [] // Supprimer le menu après la fin du temps imparti
+                    components: []
                 });
             });
 
