@@ -13,7 +13,7 @@ module.exports = {
             required: true
         }
     ],
-    execute: async (client, interaction, args, con) => {
+    execute: async (client, interaction, args) => {
         const email = interaction.options.getString('email');
 
         try {

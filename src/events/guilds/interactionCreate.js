@@ -5,7 +5,7 @@ const Pterodactyl = require("../../../handlers/functions/Pterodactyl");
 module.exports = {
 	name: 'interactionCreate',
 	once: false,
-execute: async (interaction, client, con) => {
+execute: async (interaction, client) => {
     await Modals();
 
     async function Modals() {

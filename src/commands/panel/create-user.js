@@ -4,7 +4,7 @@ module.exports = {
     name: 'create-user',
     description: '(💡) Panel',
     type: ApplicationCommandType.ChatInput,
-execute: async (client, interaction, args, con) => {
+execute: async (client, interaction, args) => {
     const modal = new ModalBuilder()
     .setCustomId('panel.create_user')
     .setTitle("Créer un utilisateur")

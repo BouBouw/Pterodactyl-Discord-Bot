@@ -7,22 +7,9 @@ class Handler {
     commands = []
 
     client
-    connection
 
-    constructor (client, connection) {
+    constructor (client) {
         this.client = client
-        this.connection = connection
-    }
-
-    async connectDatabase (connection) {
-        try {
-            await connection.connect()
-            console.log(`[SQL]`.bold.white + ` Databases has been connected!`.bold.green);
-    
-            this.connection = connection
-        } catch (error) {
-            throw new Error(error)
-        }
     }
 
     async loadCommands (directory = 'src/commands') {
@@ -61,7 +48,7 @@ class Handler {
                 if (stat.isFile() && this.fileHasValidExtension(location)) {
                     const { name, execute } = await require(join(process.cwd(), location))
                     
-                    this.client.on(name, (...args) => execute(...args, this.client, this.connection))
+                    this.client.on(name, (...args) => execute(...args, this.client))
                     console.log('[EVENTS]'.bold.yellow + ' Loading event :'.bold.white + ` ${name}`.bold.yellow);
                 }
             })
